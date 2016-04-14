@@ -4,6 +4,7 @@ package org.nlogo.window;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -268,7 +269,7 @@ public abstract strictfp class Event {
   // interface.
 
   private static Map<Class<?>, Set<Class<? extends Event>>> eventsHandledMap =
-      new HashMap<Class<?>, Set<Class<? extends Event>>>();
+      new WeakHashMap<Class<?>, Set<Class<? extends Event>>>();
 
   private boolean isHandler(Object comp, Class<? extends Event> eventClass) {
     if (!(comp instanceof Handler)) {

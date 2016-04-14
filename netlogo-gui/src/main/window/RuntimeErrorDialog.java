@@ -26,10 +26,8 @@ public strictfp class RuntimeErrorDialog
   private boolean suppressJavaExceptionDialogs = false;
   private String modelName;
 
-  private static final javax.swing.JButton SUPPRESS_BUTTON =
-      new javax.swing.JButton("Don't show again");
-  private static final javax.swing.JCheckBox CHECKBOX =
-      new javax.swing.JCheckBox("Show internal details");
+  private javax.swing.JButton suppressButton;
+  private javax.swing.JCheckBox checkbox;
 
   public static org.nlogo.swing.MessageDialog init(java.awt.Component owner) {
     dialog = new RuntimeErrorDialog(owner);
@@ -37,6 +35,7 @@ public strictfp class RuntimeErrorDialog
   }
 
   public static void deactivate() {
+    if (dialog != null) dialog.dispose();
     dialog = null;
   }
 
@@ -77,7 +76,7 @@ public strictfp class RuntimeErrorDialog
     askForBugReport = !(ordinaryError || hasKnownAncestorCause(throwable));
     // context is only non-null if the exception actually occured inside
     // running Logo code (and not, for example, in the GUI)
-    SUPPRESS_BUTTON.setVisible(!ordinaryError && context == null);
+    suppressButton.setVisible(!ordinaryError && context == null);
     javaStackTrace = org.nlogo.util.Utils.getStackTrace(throwable);
     eventTrace = org.nlogo.window.Event.recentEventTrace();
     if (context != null) {
@@ -96,7 +95,7 @@ public strictfp class RuntimeErrorDialog
     // as well still be careful
     // - ST 9/12/09
     if (textWithDetails.indexOf("sun.font.FontDesignMetrics.charsWidth") == -1) {
-      showJavaDetails(CHECKBOX.isSelected());
+      showJavaDetails(checkbox.isSelected());
     }
   }
 
@@ -112,6 +111,8 @@ public strictfp class RuntimeErrorDialog
 
   @Override
   protected List<javax.swing.JComponent> makeButtons() {
+    suppressButton = new javax.swing.JButton("Don't show again");
+    checkbox = new javax.swing.JCheckBox("Show internal details");
     List<javax.swing.JComponent> buttons =
         new ArrayList<javax.swing.JComponent>();
     buttons.addAll(super.makeButtons());
@@ -127,21 +128,21 @@ public strictfp class RuntimeErrorDialog
           });
       buttons.add(copyButton);
     }
-    CHECKBOX.addItemListener
+    checkbox.addItemListener
         (new java.awt.event.ItemListener() {
           public void itemStateChanged(java.awt.event.ItemEvent e) {
-            showJavaDetails(CHECKBOX.isSelected());
+            showJavaDetails(checkbox.isSelected());
           }
         });
-    buttons.add(CHECKBOX);
-    SUPPRESS_BUTTON.addActionListener
+    buttons.add(checkbox);
+    suppressButton.addActionListener
         (new java.awt.event.ActionListener() {
           public void actionPerformed(java.awt.event.ActionEvent e) {
             suppressJavaExceptionDialogs = true;
             setVisible(false);
           }
         });
-    buttons.add(SUPPRESS_BUTTON);
+    buttons.add(suppressButton);
     return buttons;
   }
 
@@ -184,9 +185,9 @@ public strictfp class RuntimeErrorDialog
 
   private void showJavaDetails(boolean flag) {
     if (ordinaryError) {
-      CHECKBOX.setVisible(true);
+      checkbox.setVisible(true);
     } else {
-      CHECKBOX.setVisible(false);
+      checkbox.setVisible(false);
       flag = true;
     }
     int lines = 1;
