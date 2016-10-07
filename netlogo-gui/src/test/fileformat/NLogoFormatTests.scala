@@ -18,7 +18,7 @@ abstract class NLogoFormatTest[A] extends ModelSectionTest[Array[String], NLogoF
   val extensionManager = new DummyExtensionManager()
   val compilationEnvironment = new DummyCompilationEnvironment()
 
-  def nlogoFormat = new NLogoFormat((m, _) => m)
+  def nlogoFormat = new NLogoFormat(identity)
 
   override def compareSerialized(a: Array[String], otherA: Array[String]): Boolean = {
     Arrays.deepEquals(a.asInstanceOf[Array[Object]], otherA.asInstanceOf[Array[Object]])
@@ -34,7 +34,7 @@ class NLogoFormatIOTest extends FunSuite {
   val extensionManager = new DummyExtensionManager()
   val compilationEnvironment = new DummyCompilationEnvironment()
 
-  val format = new NLogoFormat((m , _) => m)
+  val format = new NLogoFormat(identity)
 
   lazy val antsBenchmarkPath = Paths.get(modelsLibrary, "test", "benchmarks", "Ants Benchmark.nlogo")
   // sanity checking, if these fail NetLogo will be pretty unusable
@@ -74,7 +74,9 @@ class NLogoFormatConversionTest extends FunSuite {
   import AutoConversionList.ConversionList
 
   def nlogoFormat(conversions: Seq[ConversionSet]): NLogoFormat = {
-    new NLogoFormat(new ModelConverter(extensionManager, compilationEnvironment, literalParser, NetLogoLegacyDialect, _ => conversions))
+    new NLogoFormat(
+      new ModelConverter(extensionManager, compilationEnvironment, literalParser, NetLogoLegacyDialect, Seq(new NLogoLabFormat(literalParser)), _ => conversions)
+    )
   }
 
   val literalParser =

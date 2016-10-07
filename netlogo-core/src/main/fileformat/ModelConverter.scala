@@ -17,14 +17,15 @@ object ModelConverter {
     compilationEnvironment: CompilationEnvironment,
     literalParser:          LiteralParser,
     dialect:                Dialect,
-    warnOnError:            Exception => Unit = { _ => }): ((Model, Seq[AutoConvertable]) => Model) = {
+    conversionSections:     Seq[AutoConvertable] = Seq(),
+    warnOnError:            Exception => Unit = { _ => }): (Model => Model) = {
     val modelConversions = {(m: Model) =>
       AutoConversionList.conversions.collect {
         case (version, conversionSet) if Version.numericValue(m.version) < Version.numericValue(version) =>
           conversionSet
       }
     }
-    new ModelConverter(extensionManager, compilationEnvironment, literalParser, dialect, modelConversions, warnOnError)
+    new ModelConverter(extensionManager, compilationEnvironment, literalParser, dialect, conversionSections, modelConversions, warnOnError)
   }
 }
 
@@ -33,11 +34,12 @@ class ModelConverter(
   compilationEnv:        CompilationEnvironment,
   literalParser:         LiteralParser,
   baseDialect:           Dialect,
+  components:            Seq[AutoConvertable],
   applicableConversions: Model => Seq[ConversionSet] = { _ => Seq() },
   warnOnError:           Exception => Unit = { _ => })
-  extends ((Model, Seq[AutoConvertable]) => Model) {
+  extends (Model => Model) {
 
-  def apply(model: Model, components: Seq[AutoConvertable]): Model = {
+  def apply(model: Model): Model = {
     def compilationOperand(source: String, program: Program, procedures: ProceduresMap): CompilationOperand = {
       CompilationOperand(
         sources                = Map("" -> source) ++ components.flatMap(_.conversionSource(model, literalParser)).toMap,

@@ -16,8 +16,7 @@ package object fileformat {
   def hubNetReaders: Map[String, WidgetReader] =
     HubNetWidgetReaders.additionalReaders
 
-  def defaultAutoConversion: (Model, Seq[AutoConvertable]) => Model =
-    (m, _) => m
+  def defaultAutoConversion: Model => Model = identity
 
   // basicLoader only loads the core of the model, and does no autoconversion, but has no external dependencies
   def basicLoader: ConfigurableModelLoader =
@@ -26,8 +25,8 @@ package object fileformat {
       .addSerializer[Array[String], NLogoFormat](NLogoModelSettings)
 
   def standardLoader(literalParser: LiteralParser,
-    nlogoConversion: (Model, Seq[AutoConvertable]) => Model = defaultAutoConversion,
-    nlogoThreeDConversion: (Model, Seq[AutoConvertable]) => Model = defaultAutoConversion) = {
+    nlogoConversion:       Model => Model = defaultAutoConversion,
+    nlogoThreeDConversion: Model => Model = defaultAutoConversion) = {
     new ConfigurableModelLoader()
       .addFormat[Array[String], NLogoFormat](new NLogoFormat(nlogoConversion))
       .addSerializer[Array[String], NLogoFormat](NLogoModelSettings)

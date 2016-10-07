@@ -99,8 +99,8 @@ object ModelResaver {
           }
       }
       val ws = HeadlessWorkspace.newInstance
-      val twoDConverter = fileformat.ModelConverter(ws.getExtensionManager, ws.getCompilationEnvironment, literalParser, NetLogoLegacyDialect, reportError)
-      val threeDConverter = fileformat.ModelConverter(ws.getExtensionManager, ws.getCompilationEnvironment, literalParser, NetLogoThreeDDialect, reportError)
+      val twoDConverter = fileformat.ModelConverter(ws.getExtensionManager, ws.getCompilationEnvironment, literalParser, NetLogoLegacyDialect, Seq(), reportError)
+      val threeDConverter = fileformat.ModelConverter(ws.getExtensionManager, ws.getCompilationEnvironment, literalParser, NetLogoThreeDDialect, Seq(), reportError)
       val modelLoader =
         fileformat.standardLoader(ws.compiler.utilities, twoDConverter, threeDConverter)
           .addSerializer[Array[String], NLogoFormat](new NLogoSDMFormat())

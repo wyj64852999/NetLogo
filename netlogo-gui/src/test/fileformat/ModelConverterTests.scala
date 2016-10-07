@@ -15,13 +15,13 @@ class ModelConverterTests extends FunSuite {
   def converter(conversions: Model => Seq[ConversionSet] = (_ => Seq()),
     onError: Exception => Unit = { (e: Exception) => throw e }) = {
     def literalParser = Femto.scalaSingleton[LiteralParser]("org.nlogo.parse.CompilerUtilities")
-    new ModelConverter(VidExtensionManager, FooCompilationEnvironment, literalParser, NetLogoLegacyDialect, conversions, onError)
+    new ModelConverter(VidExtensionManager, FooCompilationEnvironment, literalParser, NetLogoLegacyDialect, componentConverters, conversions, onError)
   }
 
   val componentConverters = Seq(new WidgetConverter() {})
 
   def convert(model: Model, conversions: ConversionSet*): Model =
-    converter(_ => conversions)(model, componentConverters)
+    converter(_ => conversions)(model)
 
   test("if the model is empty, returns the model") {
     val model = Model()
@@ -42,7 +42,7 @@ class ModelConverterTests extends FunSuite {
   test("if the model code tab doesn't compile, returns the model as-is") {
     val model = Model(code = "fd 1")
     val convertedModel =
-      converter(_ => Seq(ConversionSet(codeTabConversions = Seq(_.addGlobal("foo")), targets = Seq("fd"))), { _ => })(model, componentConverters)
+      converter(_ => Seq(ConversionSet(codeTabConversions = Seq(_.addGlobal("foo")), targets = Seq("fd"))), { _ => })(model)
     assert(convertedModel == model)
   }
 

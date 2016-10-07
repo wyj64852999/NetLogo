@@ -14,7 +14,7 @@ import scala.util.{ Failure, Success, Try }
 import scala.io.Source
 
 // THIS format is the 2D format, for changes that affect both 2D and 3D, change AbstractNLogoFormat
-class NLogoFormat(val modelConverter: (Model, Seq[AutoConvertable]) => Model)
+class NLogoFormat(val modelConverter: Model => Model)
   extends ModelFormat[Array[String], NLogoFormat]
   with AbstractNLogoFormat[NLogoFormat] {
     val is3DFormat = false
@@ -32,12 +32,12 @@ trait AbstractNLogoFormat[A <: ModelFormat[Array[String], A]] extends ModelForma
 
   def widgetReaders: Map[String, WidgetReader]
 
-  def modelConverter: (Model, Seq[AutoConvertable]) => Model
+  def modelConverter: Model => Model
 
   override def constructModel(
     components: Seq[ComponentSerialization[Array[String], A]],
     sections:   Map[String, Array[String]]) = {
-      super.constructModel(components, sections).map(modelConverter(_, components))
+      super.constructModel(components, sections).map(modelConverter)
   }
 
   def sections(location: URI) =
