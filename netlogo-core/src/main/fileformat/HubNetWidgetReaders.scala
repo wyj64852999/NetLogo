@@ -11,7 +11,7 @@ import org.nlogo.core.model.WidgetReader
 
 import scala.reflect.ClassTag
 
-import ParboiledWidgetParser.{ restoreLines, stripLines }
+import ParsingStringUtils.{ restoreLines, stripLines }
 
 object HubNetWidgetReaders {
   def saveNillableString(s: String): String =

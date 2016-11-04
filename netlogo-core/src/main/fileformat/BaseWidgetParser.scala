@@ -11,10 +11,8 @@ object BaseWidgetParser extends ParsingStringUtils {
     implicit class EnrichedRule[S](r: Rule1[S]) {
       def through(otherRule: Rule0): Rule1[S] =
         rule { (r ~ otherRule) }
-      /*
       def mapThrough(otherRule: Rule1[S => S]) =
-        (r ~ otherRule) ~> ((s: S, f: S => S) => f(s))
-      */
+        rule { (r ~ otherRule) ~> ((s: S, f: S => S) => f(s)) }
     }
 
     def DoubleValue: Rule1[Double] = rule { capture(DoubleDigits) ~> ((digits: String) => digits.toDouble) }
